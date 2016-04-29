@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+
+        <!--
+            Browsers display pages in a virtual window named "viewport" which
+            is often larger than the screen.
+
+            The "width" attribute controls the viewport width.
+            The "initial-scale" attribute controls the zoom level when the page is
+            loaded for the first time.
+        -->
+    	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <!--
+            Providing the manifest for installing the web application.
+
+            A JSON document is loaded with information about the application
+            (name, icons...).
+
+            TODO Check why we keep this.
+        -->
+        <link rel="manifest" href="manifest.json">
+
+        <!--
+            This metadata seems linked to the  web application installation.
+            https://developer.chrome.com/multidevice/android/installtohomescreen
+
+            TODO Check why we keep this.
+        -->
+        <meta name="mobile-web-app-capable" content="yes">
+
+        <title>AgileStack root application</title>
+
+        <!--
+            TODO Check why we have to set this variable here.
+        -->
+        <script>
+            window.baseUrl="/";
+            console.log('set window.baseUrl =', window.baseUrl);
+        </script>
+	</head>
+	<body>
+		<!-- The app hooks into this div -->
+		<div id="app"></div>
+		<!-- Open Sans Font -->
+		<link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700" rel="stylesheet">
+		<!-- Due to the way webpack works, a lot of magic happens in this file. HtmlWebpackPlugin automatically includes all assets (e.g. bundle.js, main.css) with the correct HTML tags, which is why they are missing in this HTML file. Check out webpackconfig.js if you want to know more. -->
+	</body>
+</html>

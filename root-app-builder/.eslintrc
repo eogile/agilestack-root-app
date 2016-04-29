@@ -1,0 +1,52 @@
+{
+    /*
+     * https://www.npmjs.com/package/eslint-config-airbnb
+     *
+     * Defines rules for EcmaScript 6 and React.
+     */
+    "extends": "airbnb",
+
+    /*
+     * An environment defines global variables that are predefined.
+     */
+    "env": {
+        "browser": true,
+        "node": true,
+        "mocha": true
+    },
+
+    /*
+     * Object specifying which additional language features we want
+     * to use.
+     */
+    "ecmaFeatures": {
+        /*
+         * Enable support of "forOf" loops :
+         * Example :
+         *      let values = [1, 2, 3];
+         *      for(let value of values) { ... }
+         */
+        "forOf": true,
+        "jsx": true,
+        "es6": true
+    },
+    "rules": {
+        /*
+         * Disabling the checks about dangling commas in JavaScript objects.
+         */
+        "comma-dangle": 0,
+        /*
+         * Rules for indentation : two spaces.
+         *
+         * Switch cases are also indented.
+         */
+        "indent": [2, 2, {"SwitchCase": 1}],
+        /*
+         * Disabling the rule preventing missing prop types in
+         * React components.
+         *
+         * https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/prop-types.md
+         */
+        "react/prop-types": 0
+    }
+}
