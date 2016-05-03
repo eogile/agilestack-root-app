@@ -12,7 +12,7 @@ dependencies:
 
   override:
     - mkdir -p $PROJECT_PARENT
-    - ln -fs $HOME/$CIRCLE_PROJECT_REPONAME $PROJECT_PATH
+    - rsync -aC --delete ./ "$PROJECT_PATH/"
     - |
       echo 'export GOPATH=$GOPATH:$HOME/.go_project' >> ~/.circlerc
     - cd $PROJECT_PATH && make setup
