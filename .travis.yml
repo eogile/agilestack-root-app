@@ -3,6 +3,9 @@ sudo: required
 services:
   - docker
 
+env:
+  - DOCKER_BIND_LOCALHOST=true
+
 language: go
 
 go:
