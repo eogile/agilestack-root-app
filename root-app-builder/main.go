@@ -26,7 +26,6 @@ import (
 
 	"github.com/eogile/agilestack-root-app/root-app-builder/server/files"
 	"github.com/eogile/agilestack-root-app/root-app-builder/server/handlers"
-	"github.com/eogile/agilestack-root-app/root-app-builder/server/repository"
 	"github.com/eogile/agilestack-root-app/root-app-builder/server/services"
 	"github.com/eogile/agilestack-utils/plugins"
 )
@@ -39,11 +38,6 @@ func init() {
 }
 
 func main() {
-	err := initDB()
-	if err != nil {
-		log.Fatalln("Unable to initialize the database: ", err)
-	}
-	log.Println("Database initialized")
 
 	initBaseURL()
 
@@ -53,35 +47,16 @@ func main() {
 	 */
 	files.CheckFilesExistence()
 
-	err = services.BuildApplication()
+	err := services.BuildApplication()
 	if err != nil {
 		log.Fatalln("Unable to build the application: ", err)
 	}
 
 	http.HandleFunc("/status", plugins.HandleHttpStatusUrl)
-	http.HandleFunc("/plugins", handlers.HandlePluginsEndpoint)
+	http.HandleFunc("/plugins", handlers.NewGenerationHandler(handlers.BuildApplication).HandlePluginsEndpoint)
 	http.HandleFunc("/menu-entries", handlers.HandleMenuEntriesEndpoint)
 	http.ListenAndServe(":8080", nil)
 }
-
-/*
- * Initializes the database access and returns an error
- * if something wrong happens.
- */
-func initDB() error {
-	connectionString := "user=agilestack " +
-		"password=agilestack_power " +
-		"dbname=agilestack_db " +
-		"host=192.168.99.100 " +
-		"port=5433 " +
-		"sslmode=disable"
-	if os.Getenv("DB_CONNECTION_STRING") != "" {
-		connectionString = os.Getenv("DB_CONNECTION_STRING")
-	}
-	log.Println("Using connection string:", connectionString)
-	return repository.InitDB(connectionString)
-}
-
 /*
  * modify the index.html to use the url prefix (basename) provided by environment variable
  */

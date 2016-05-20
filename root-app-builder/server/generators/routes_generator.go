@@ -3,22 +3,22 @@ package generators
 import (
 	"strconv"
 
-	"github.com/eogile/agilestack-root-app/root-app-builder/server/models"
+	"github.com/eogile/agilestack-utils/plugins/registration"
 )
 
 /*
  * Generating the JavaScript file that will contain the routes.
  */
-func GenerateRoutesFile(routes []models.Route, fileName string) error {
-	return generateFile(generateRoutes(routes), fileName)
+func GenerateRoutesFile(configs []registration.PluginConfiguration, fileName string) error {
+	return generateFile(generateRoutes(configs), fileName)
 }
 
-func generateRoutes(routes []models.Route) string {
+func generateRoutes(configs []registration.PluginConfiguration) string {
 	result := "Object.defineProperty(exports, \"__esModule\", {\n"
 	result += "  value: true\n"
 	result += "});\n"
 
-	if len(routes) == 0 {
+	if len(configs) == 0 {
 		return result + "exports.default = [];\n"
 	}
 
@@ -26,27 +26,32 @@ func generateRoutes(routes []models.Route) string {
 	 * Route JSON objects
 	 */
 	routesNames := ""
-	for index, route := range routes {
-		result += "var _routeComponent" +
-			strconv.Itoa(index) +
-			" = require('" +
-			route.ModuleName +
-			"')." +
-			route.ComponentName +
-			";\n"
-		result += "var _route" +
-			strconv.Itoa(index) +
-			" = {href: '" +
-			route.Href +
-			"', component: _routeComponent" +
-			strconv.Itoa(index) +
-			"};\n"
+	for index, config := range configs {
+		for index2, route := range config.Routes {
+			result += "var _routeComponent" +
+				strconv.Itoa(index) +
+				strconv.Itoa(index2) +
+				" = require('" +
+				config.PluginName +
+				"')." +
+				route.ComponentName +
+				";\n"
+			result += "var _route" +
+				strconv.Itoa(index) +
+				strconv.Itoa(index2) +
+				" = {href: '" +
+				route.Href +
+				"', component: _routeComponent" +
+				strconv.Itoa(index) +
+				strconv.Itoa(index2) +
+				"};\n"
 
-		routeName := "_route" + strconv.Itoa(index)
-		if index > 0 {
-			routesNames += ", "
+			routeName := "_route" + strconv.Itoa(index) + strconv.Itoa(index2)
+			if index > 0 || index2 > 0{
+				routesNames += ", "
+			}
+			routesNames += routeName
 		}
-		routesNames += routeName
 	}
 
 	return result + "exports.default = [" + routesNames + "];\n"

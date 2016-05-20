@@ -3,22 +3,22 @@ package generators
 import (
 	"strconv"
 
-	"github.com/eogile/agilestack-root-app/root-app-builder/server/models"
+	"github.com/eogile/agilestack-utils/plugins/registration"
 )
 
 /*
  * Generating the JavaScript file that will contain the reducers.
  */
-func GenerateReducersFile(reducers []models.Reducer, fileName string) error {
-	return generateFile(generateReducers(reducers), fileName)
+func GenerateReducersFile(configs []registration.PluginConfiguration, fileName string) error {
+	return generateFile(generateReducers(configs), fileName)
 }
 
-func generateReducers(reducers []models.Reducer) string {
+func generateReducers(configs []registration.PluginConfiguration) string {
 	result := "Object.defineProperty(exports, \"__esModule\", {\n"
 	result += "  value: true\n"
 	result += "});\n"
 
-	if len(reducers) == 0 {
+	if len(configs) == 0 {
 		return result + "exports.default = {};\n"
 	}
 	reducersNames := ""
@@ -26,20 +26,22 @@ func generateReducers(reducers []models.Reducer) string {
 	/*
 	 * Generates the "import" statements for each reducer.
 	 */
-	for index, reducer := range reducers {
-		result += "var _reducer" +
-			strconv.Itoa(index) +
-			" = require('" +
-			reducer.ModuleName +
-			"')." +
-			reducer.Name +
-			";\n"
-		//result += generateImportStatement(reducer.Name, reducer.ModuleName)
+	for index, config := range configs {
+		for index2, reducer := range config.Reducers {
+			result += "var _reducer" +
+				strconv.Itoa(index) +
+				strconv.Itoa(index2) +
+				" = require('" +
+				config.PluginName +
+				"')." +
+				reducer +
+				";\n"
 
-		if index > 0 {
-			reducersNames += ", "
+			if index > 0 || index2 > 0 {
+				reducersNames += ", "
+			}
+			reducersNames += reducer + ": " + "_reducer" + strconv.Itoa(index) + strconv.Itoa(index2)
 		}
-		reducersNames += reducer.Name + ": " + "_reducer" + strconv.Itoa(index)
 	}
 
 	return result + "exports.default = {" + reducersNames + "};\n"
