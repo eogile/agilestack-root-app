@@ -43,24 +43,27 @@ func TestGenerateRoutesFile(t *testing.T) {
 		registration.PluginConfiguration{
 			PluginName: "module1",
 			Reducers:   []string{},
-			Routes:     []registration.Route{
+			Routes: []registration.Route{
 				registration.Route{
 					Href:          "route10",
 					ComponentName: "component1",
+					Type: "content-route",
 				},
 				registration.Route{
 					Href:          "route20",
 					ComponentName: "component2",
+					Type: "full-screen-route",
 				},
 			},
 		},
 		registration.PluginConfiguration{
 			PluginName: "module2",
 			Reducers:   []string{},
-			Routes:     []registration.Route{
+			Routes: []registration.Route{
 				registration.Route{
 					Href:          "route30",
 					ComponentName: "Component3",
+					Type: "content-route",
 				},
 			},
 		},
@@ -78,13 +81,84 @@ func TestGenerateRoutesFile(t *testing.T) {
 	expected := "Object.defineProperty(exports, \"__esModule\", {\n"
 	expected += "  value: true\n"
 	expected += "});\n"
-	expected += "var _routeComponent00 = require('module1').component1;\n"
-	expected += "var _route00 = {href: 'route10', component: _routeComponent00};\n"
-	expected += "var _routeComponent01 = require('module1').component2;\n"
-	expected += "var _route01 = {href: 'route20', component: _routeComponent01};\n"
-	expected += "var _routeComponent10 = require('module2').Component3;\n"
-	expected += "var _route10 = {href: 'route30', component: _routeComponent10};\n"
-	expected += "exports.default = [_route00, _route01, _route10];\n"
+	expected += "exports.default = [\n"
+	expected += "{href:'route10', type:'content-route', component: require('module1').component1, routes:[]},\n"
+	expected += "{href:'route20', type:'full-screen-route', component: require('module1').component2, routes:[]},\n"
+	expected += "{href:'route30', type:'content-route', component: require('module2').Component3, routes:[]}"
+	expected += "];\n"
+
+	require.Equal(t, expected, string(bytes),
+		"The file content does not match")
+}
+
+// With sub routes
+func TestGenerateRoutesFile_WithSubRoutes(t *testing.T) {
+	fileName, fileClose := testTempFile(t)
+	defer fileClose()
+	configurations := []registration.PluginConfiguration{
+		registration.PluginConfiguration{
+			PluginName: "module1",
+			Reducers:   []string{},
+			Routes: []registration.Route{
+				registration.Route{
+					Href:          "route10",
+					ComponentName: "component1",
+					Routes:        []registration.SubRoute{},
+					Type: "content-route",
+				},
+				registration.Route{
+					Href:          "route20",
+					ComponentName: "component2",
+					Routes: []registration.SubRoute{
+						registration.SubRoute{
+							Href:          "route201",
+							ComponentName: "component21",
+						},
+						registration.SubRoute{
+							Href:          "route202",
+							ComponentName: "component22",
+						},
+					},
+					Type: "full-screen-route",
+				},
+			},
+		},
+		registration.PluginConfiguration{
+			PluginName: "module2",
+			Reducers:   []string{},
+			Routes: []registration.Route{
+				registration.Route{
+					ComponentName: "Component3",
+					Routes: []registration.SubRoute{
+						registration.SubRoute{
+							Href:          "route301",
+							ComponentName: "component31",
+							Routes:        []registration.SubRoute{},
+						},
+					},
+					Type: "content-route",
+				},
+			},
+		},
+	}
+
+	err := generators.GenerateRoutesFile(configurations, fileName)
+	require.Nil(t, err, "Error while generating the file")
+
+	bytes, err := ioutil.ReadFile(fileName)
+	require.Nil(t, err, "Error while reading the generated file")
+
+	/*
+	 * The expected file content.
+	 */
+	expected := "Object.defineProperty(exports, \"__esModule\", {\n"
+	expected += "  value: true\n"
+	expected += "});\n"
+	expected += "exports.default = [\n"
+	expected += "{href:'route10', type:'content-route', component: require('module1').component1, routes:[]},\n"
+	expected += "{href:'route20', type:'full-screen-route', component: require('module1').component2, routes:[{href:'route201', component: require('module1').component21, routes:[]}, {href:'route202', component: require('module1').component22, routes:[]}]},\n"
+	expected += "{type:'content-route', component: require('module2').Component3, routes:[{href:'route301', component: require('module2').component31, routes:[]}]}"
+	expected += "];\n"
 
 	require.Equal(t, expected, string(bytes),
 		"The file content does not match")

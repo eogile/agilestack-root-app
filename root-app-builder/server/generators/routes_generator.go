@@ -1,8 +1,6 @@
 package generators
 
 import (
-	"strconv"
-
 	"github.com/eogile/agilestack-utils/plugins/registration"
 )
 
@@ -25,34 +23,55 @@ func generateRoutes(configs []registration.PluginConfiguration) string {
 	/*
 	 * Route JSON objects
 	 */
-	routesNames := ""
-	for index, config := range configs {
-		for index2, route := range config.Routes {
-			result += "var _routeComponent" +
-				strconv.Itoa(index) +
-				strconv.Itoa(index2) +
-				" = require('" +
-				config.PluginName +
-				"')." +
-				route.ComponentName +
-				";\n"
-			result += "var _route" +
-				strconv.Itoa(index) +
-				strconv.Itoa(index2) +
-				" = {href: '" +
-				route.Href +
-				"', component: _routeComponent" +
-				strconv.Itoa(index) +
-				strconv.Itoa(index2) +
-				"};\n"
 
-			routeName := "_route" + strconv.Itoa(index) + strconv.Itoa(index2)
-			if index > 0 || index2 > 0{
-				routesNames += ", "
+	result += "exports.default = [\n"
+
+	for index1, config := range configs {
+		for index2, route := range config.Routes {
+			if index1 > 0 || index2> 0 {
+				result += ",\n"
 			}
-			routesNames += routeName
+
+			result += routeJSObject(config.PluginName, route)
 		}
 	}
 
-	return result + "exports.default = [" + routesNames + "];\n"
+	return result + "];\n"
+}
+
+func routeJSObject(pluginName string, route registration.Route) string {
+	result := "{"
+	if route.Href != "" {
+		result += "href:'" + route.Href + "', "
+	}
+	result += "type:'" + route.Type + "', "
+	result += "component: require('" + pluginName + "')." + route.ComponentName + ", "
+	result += "routes:["
+	for index, subRoute := range route.Routes {
+		if index != 0 {
+			result += ", "
+		}
+		result += subRouteJSObject(pluginName, subRoute)
+	}
+	result+= "]"
+	return result + "}"
+}
+
+func subRouteJSObject(pluginName string,subRoute registration.SubRoute) string {
+	result := "{"
+
+	if subRoute.Href != "" {
+		result += "href:'" + subRoute.Href + "', "
+	}
+	result += "component: require('" + pluginName + "')." + subRoute.ComponentName + ", "
+	result += "routes:["
+	for index, subSubRoute := range subRoute.Routes {
+		if index != 0 {
+			result += ", "
+		}
+		result += subRouteJSObject(pluginName, subSubRoute)
+	}
+
+	result+= "]"
+	return result + "}"
 }

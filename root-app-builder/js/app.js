@@ -66,34 +66,16 @@ const history = useBasename(createHistory)({
   basename: window.baseUrl
 });
 
-/**
- * FIXME Removes these imports when components will be provided by other plugins.
- */
-import {Plugin1Feature1, Plugin2Feature1, Plugin2Feature2} from './components/pages/TemporaryMenuPages.react';
-
-import pluginsRoutes from './generated/routes';
+import getRoutes from './routes';
 
 // Mostly boilerplate, except for the Routes. These are the pages you can go to,
 // which are all wrapped in the App component, which contains the navigation etc
 ReactDOM.render(
   <Provider store={store}>
     <Router history={history}>
-      <Route path="/" component={App}>
-        <IndexRoute component={HomePage}/>
-        <Route key="readme" path="/readme" component={ReadmePage}/>
-
-        <Route key="plugin1/feature1" path="/plugin1/feature1" component={Plugin1Feature1}/>
-        <Route key="plugin2/feature1" path="/plugin2/feature1" component={Plugin2Feature1}/>
-        <Route key="plugin2/feature2" path="/plugin2/feature2" component={Plugin2Feature2}/>
-
-        {
-          pluginsRoutes.map((route) =>
-            <Route key={route.href} path={route.href} component={route.component} />
-          )
-        }
-
-        <Route path="*" component={NotFoundPage}/>
-      </Route>
+      {
+        getRoutes()
+      }
     </Router>
   </Provider>,
   document.getElementById('app')
@@ -102,5 +84,5 @@ ReactDOM.render(
 /*
  * Loading the main menu
  */
-import {asyncLoadMainMenu} from './actions/AppActions';
-store.dispatch(asyncLoadMainMenu());
+// import {asyncLoadMainMenu} from './actions/AppActions';
+// store.dispatch(asyncLoadMainMenu());
