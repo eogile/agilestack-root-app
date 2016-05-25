@@ -36,7 +36,7 @@ func Main(m *testing.M) {
 	/*
 	 * Starting a Consul Docker container.
 	 */
-	if err := test.StartConsulContainer(dockerClient); err != nil {
+	if err := test.StartConsulContainer(dockerClient, "testNetwork"); err != nil {
 		log.Fatalln("Unable to start a Docker container", err)
 	}
 
