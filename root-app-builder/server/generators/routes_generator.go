@@ -1,6 +1,8 @@
 package generators
 
 import (
+	"strconv"
+
 	"github.com/eogile/agilestack-utils/plugins/registration"
 )
 
@@ -28,7 +30,7 @@ func generateRoutes(configs []registration.PluginConfiguration) string {
 
 	for index1, config := range configs {
 		for index2, route := range config.Routes {
-			if index1 > 0 || index2> 0 {
+			if index1 > 0 || index2 > 0 {
 				result += ",\n"
 			}
 
@@ -44,6 +46,7 @@ func routeJSObject(pluginName string, route registration.Route) string {
 	if route.Href != "" {
 		result += "href:'" + route.Href + "', "
 	}
+	result += "isIndex:" + strconv.FormatBool(route.IsIndex) + ", "
 	result += "type:'" + route.Type + "', "
 	result += "component: require('" + pluginName + "')." + route.ComponentName + ", "
 	result += "routes:["
@@ -53,11 +56,11 @@ func routeJSObject(pluginName string, route registration.Route) string {
 		}
 		result += subRouteJSObject(pluginName, subRoute)
 	}
-	result+= "]"
+	result += "]"
 	return result + "}"
 }
 
-func subRouteJSObject(pluginName string,subRoute registration.SubRoute) string {
+func subRouteJSObject(pluginName string, subRoute registration.SubRoute) string {
 	result := "{"
 
 	if subRoute.Href != "" {
@@ -72,6 +75,6 @@ func subRouteJSObject(pluginName string,subRoute registration.SubRoute) string {
 		result += subRouteJSObject(pluginName, subSubRoute)
 	}
 
-	result+= "]"
+	result += "]"
 	return result + "}"
 }

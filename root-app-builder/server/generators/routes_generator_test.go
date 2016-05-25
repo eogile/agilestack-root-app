@@ -47,12 +47,14 @@ func TestGenerateRoutesFile(t *testing.T) {
 				registration.Route{
 					Href:          "route10",
 					ComponentName: "component1",
-					Type: "content-route",
+					Type:          "content-route",
+					IsIndex:       true,
 				},
 				registration.Route{
 					Href:          "route20",
 					ComponentName: "component2",
-					Type: "full-screen-route",
+					Type:          "full-screen-route",
+					IsIndex:       false,
 				},
 			},
 		},
@@ -63,7 +65,8 @@ func TestGenerateRoutesFile(t *testing.T) {
 				registration.Route{
 					Href:          "route30",
 					ComponentName: "Component3",
-					Type: "content-route",
+					Type:          "content-route",
+					IsIndex:       false,
 				},
 			},
 		},
@@ -82,9 +85,9 @@ func TestGenerateRoutesFile(t *testing.T) {
 	expected += "  value: true\n"
 	expected += "});\n"
 	expected += "exports.default = [\n"
-	expected += "{href:'route10', type:'content-route', component: require('module1').component1, routes:[]},\n"
-	expected += "{href:'route20', type:'full-screen-route', component: require('module1').component2, routes:[]},\n"
-	expected += "{href:'route30', type:'content-route', component: require('module2').Component3, routes:[]}"
+	expected += "{href:'route10', isIndex:true, type:'content-route', component: require('module1').component1, routes:[]},\n"
+	expected += "{href:'route20', isIndex:false, type:'full-screen-route', component: require('module1').component2, routes:[]},\n"
+	expected += "{href:'route30', isIndex:false, type:'content-route', component: require('module2').Component3, routes:[]}"
 	expected += "];\n"
 
 	require.Equal(t, expected, string(bytes),
@@ -104,7 +107,8 @@ func TestGenerateRoutesFile_WithSubRoutes(t *testing.T) {
 					Href:          "route10",
 					ComponentName: "component1",
 					Routes:        []registration.SubRoute{},
-					Type: "content-route",
+					Type:          "content-route",
+					IsIndex:       false,
 				},
 				registration.Route{
 					Href:          "route20",
@@ -136,7 +140,8 @@ func TestGenerateRoutesFile_WithSubRoutes(t *testing.T) {
 							Routes:        []registration.SubRoute{},
 						},
 					},
-					Type: "content-route",
+					Type:    "content-route",
+					IsIndex: true,
 				},
 			},
 		},
@@ -155,9 +160,9 @@ func TestGenerateRoutesFile_WithSubRoutes(t *testing.T) {
 	expected += "  value: true\n"
 	expected += "});\n"
 	expected += "exports.default = [\n"
-	expected += "{href:'route10', type:'content-route', component: require('module1').component1, routes:[]},\n"
-	expected += "{href:'route20', type:'full-screen-route', component: require('module1').component2, routes:[{href:'route201', component: require('module1').component21, routes:[]}, {href:'route202', component: require('module1').component22, routes:[]}]},\n"
-	expected += "{type:'content-route', component: require('module2').Component3, routes:[{href:'route301', component: require('module2').component31, routes:[]}]}"
+	expected += "{href:'route10', isIndex:false, type:'content-route', component: require('module1').component1, routes:[]},\n"
+	expected += "{href:'route20', isIndex:false, type:'full-screen-route', component: require('module1').component2, routes:[{href:'route201', component: require('module1').component21, routes:[]}, {href:'route202', component: require('module1').component22, routes:[]}]},\n"
+	expected += "{isIndex:true, type:'content-route', component: require('module2').Component3, routes:[{href:'route301', component: require('module2').component31, routes:[]}]}"
 	expected += "];\n"
 
 	require.Equal(t, expected, string(bytes),
