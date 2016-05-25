@@ -84,7 +84,7 @@ func createDirIfNotExist(path string) {
 		return
 	}
 	log.Println("Creating directory:", path)
-	err := os.MkdirAll(path, 0644)
+	err := os.MkdirAll(path, 0755)
 	if err != nil {
 		log.Fatalf("Error while creating directory %s: %v", path, err)
 	}
