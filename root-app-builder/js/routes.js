@@ -2,8 +2,7 @@
 import React from 'react';
 import { Route, IndexRoute } from 'react-router';
 
-import { App } from './generated/app.component';
-import { Main } from './generated/main.component';
+import { App, Main } from './generated/components';
 import pluginsRoutes from './generated/routes';
 
 let counter = 0;

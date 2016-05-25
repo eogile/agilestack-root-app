@@ -18,6 +18,7 @@ var (
 	HTTPDirectory          string
 	ReducersFile           string
 	RoutesFile             string
+	ComponentsFile         string
 	SharedModulesDirectory string
 )
 
@@ -29,12 +30,14 @@ func init() {
 	OutputDirectory = absolutePath(SourcesDirectory + "/build/")
 	ReducersFile = absolutePath(SourcesDirectory + "/js/generated/reducers.js")
 	RoutesFile = absolutePath(SourcesDirectory + "/js/generated/routes.js")
+	ComponentsFile = absolutePath(SourcesDirectory + "/js/generated/components.js")
 
 	log.Println("Sources directory:", SourcesDirectory)
 	log.Println("Output directory :", OutputDirectory)
 	log.Println("HTTP directory   :", HTTPDirectory)
 	log.Println("Reducers files   :", ReducersFile)
 	log.Println("Routes files     :", RoutesFile)
+	log.Println("Components files :", ComponentsFile)
 	log.Println("Modules directory:", SharedModulesDirectory)
 
 	// Creating directories that may not exists
@@ -76,13 +79,13 @@ func exists(path string) bool {
 	return !os.IsNotExist(err)
 }
 
-func createDirIfNotExist(path string)  {
+func createDirIfNotExist(path string) {
 	if exists(path) {
 		return
 	}
 	log.Println("Creating directory:", path)
 	err := os.MkdirAll(path, 0644)
-	if err!= nil {
+	if err != nil {
 		log.Fatalf("Error while creating directory %s: %v", path, err)
 	}
 }

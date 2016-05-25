@@ -5,15 +5,16 @@ import (
 	"net/http"
 
 	"github.com/eogile/agilestack-utils/plugins/registration"
+	"github.com/eogile/agilestack-utils/plugins/components"
 )
 
 
 
 type registrationHandler struct {
-	delegateFunction func(http.ResponseWriter, []registration.PluginConfiguration)
+	delegateFunction func(http.ResponseWriter, []registration.PluginConfiguration, *components.Components)
 }
 
-func NewGenerationHandler(generationFunction func(http.ResponseWriter, []registration.PluginConfiguration)) *registrationHandler {
+func NewGenerationHandler(generationFunction func(http.ResponseWriter, []registration.PluginConfiguration, *components.Components)) *registrationHandler {
 	return &registrationHandler{
 		delegateFunction: generationFunction,
 	}
@@ -39,8 +40,13 @@ func (h *registrationHandler)  handlePluginsPost(w http.ResponseWriter, r *http.
 		log.Println("Error while loading configurations from Consul", err)
 	}
 
+	appComponents, err := components.GetComponents()
+	if err != nil {
+		log.Println("Error while loading app components from Consul", err)
+	}
+
 	/*
 	 * Calling the delegate function
 	 */
-	h.delegateFunction(w, configurations)
+	h.delegateFunction(w, configurations, appComponents)
 }

@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/hashicorp/consul/api"
 	"github.com/eogile/agilestack-utils/plugins/registration"
+	"github.com/eogile/agilestack-utils/plugins/components"
 )
 
 func init() {
@@ -20,6 +21,7 @@ func init() {
 func Main(m *testing.M) {
 	menu.SetConsulAddress("127.0.0.1:8501")
 	registration.SetConsulAddress("127.0.0.1:8501")
+	components.SetConsulAddress("127.0.0.1:8501")
 
 	/*
 	 * Docker client for test utilities
@@ -29,15 +31,12 @@ func Main(m *testing.M) {
 	/*
 	 * Creating the Docker network if it does not exist.
 	 */
-	err := test.CreateNetworkIfNotExists(dockerClient, "testNetwork")
-	if err != nil {
-		log.Fatalln("Unable to create a Docker network:", err)
-	}
+	dockerClient.CreateNetWorkIfNeeded("testNetwork")
 
 	/*
 	 * Starting a Consul Docker container.
 	 */
-	if err = test.StartConsulContainer(dockerClient); err != nil {
+	if err := test.StartConsulContainer(dockerClient); err != nil {
 		log.Fatalln("Unable to start a Docker container", err)
 	}
 

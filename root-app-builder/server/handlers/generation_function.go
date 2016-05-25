@@ -8,10 +8,11 @@ import (
 	"github.com/eogile/agilestack-root-app/root-app-builder/server/generators"
 	"github.com/eogile/agilestack-root-app/root-app-builder/server/services"
 	"github.com/eogile/agilestack-root-app/root-app-builder/server/utils/npm"
+	"github.com/eogile/agilestack-utils/plugins/components"
 	"github.com/eogile/agilestack-utils/plugins/registration"
 )
 
-func generateFiles(configurations []registration.PluginConfiguration) error {
+func generateFiles(configurations []registration.PluginConfiguration, components *components.Components) error {
 	err := generateReducersFile(configurations)
 	if err != nil {
 		log.Printf("Error while generating the reducers file: %v\n", err)
@@ -20,6 +21,11 @@ func generateFiles(configurations []registration.PluginConfiguration) error {
 	err = generateRoutesFile(configurations)
 	if err != nil {
 		log.Printf("Error while generating the routes file: %v\n", err)
+	}
+
+	err = generateComponentsFile(components)
+	if err != nil {
+		log.Printf("Error while generating the components file: %v\n", err)
 	}
 	return err
 }
@@ -36,11 +42,18 @@ func generateRoutesFile(configurations []registration.PluginConfiguration) error
 		appFiles.RoutesFile)
 }
 
-func BuildApplication(w http.ResponseWriter, configurations []registration.PluginConfiguration) {
+func generateComponentsFile(components *components.Components) error {
+	return generators.GenerateComponentsFile(components, appFiles.ComponentsFile)
+}
+
+func BuildApplication(w http.ResponseWriter,
+	configurations []registration.PluginConfiguration,
+	components *components.Components) {
+
 	/*
 	 * Generating the routes and reducers file.
 	 */
-	err := generateFiles(configurations)
+	err := generateFiles(configurations, components)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return

@@ -9,6 +9,7 @@ import (
 
 	"github.com/eogile/agilestack-root-app/root-app-builder/server/handlers"
 	testUtils "github.com/eogile/agilestack-root-app/root-app-builder/server/testing"
+	"github.com/eogile/agilestack-utils/plugins/components"
 	"github.com/eogile/agilestack-utils/plugins/registration"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -25,10 +26,14 @@ var (
 			registration.Route{
 				ComponentName: "Component1",
 				Href:          "/route-1",
+				Routes:        []registration.SubRoute{},
+				Type:          "content-route",
 			},
 			registration.Route{
 				ComponentName: "Component1",
 				Href:          "/route-2_1",
+				Routes:        []registration.SubRoute{},
+				Type:          "content-route",
 			},
 		},
 	}
@@ -40,19 +45,21 @@ var (
 			registration.Route{
 				ComponentName: "SomeBusinessComponent",
 				Href:          "/route-10",
+				Routes:        []registration.SubRoute{},
+				Type:          "content-route",
 			},
 		},
 	}
 )
 
-func TestHandlePluginsEndpoint(t *testing.T) {
+func TestHandlePluginsEndpoint_Routes(t *testing.T) {
 	testUtils.DeleteAllStoreEntries(t)
 
 	require.Nil(t, registration.StoreRoutesAndReducers(&config1))
 	require.Nil(t, registration.StoreRoutesAndReducers(&config2))
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("/", generationEndpoint())
+	mux.HandleFunc("/", routesGenerationEndpoint())
 
 	writer := httptest.NewRecorder()
 	request, _ := http.NewRequest("POST", "/", nil)
@@ -84,11 +91,11 @@ func TestHandlePluginsEndpoint(t *testing.T) {
 	}
 }
 
-func TestHandlePluginsEndpoint_NoPlugin(t *testing.T) {
+func TestHandlePluginsEndpoint_NoRoutes(t *testing.T) {
 	testUtils.DeleteAllStoreEntries(t)
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("/", generationEndpoint())
+	mux.HandleFunc("/", routesGenerationEndpoint())
 
 	writer := httptest.NewRecorder()
 	request, _ := http.NewRequest("POST", "/", nil)
@@ -108,10 +115,81 @@ func TestHandlePluginsEndpoint_NoPlugin(t *testing.T) {
 	assert.Equal(t, "[]", string(writer.Body.Bytes()))
 }
 
-func generationEndpoint() func(http.ResponseWriter, *http.Request) {
+func TestHandlePluginsEndpoint_Components(t *testing.T) {
+	testUtils.DeleteAllStoreEntries(t)
+
+	storedComponent := &components.Components{
+		PluginName:    "my-plugin",
+		AppComponent:  "App3",
+		MainComponent: "Main3",
+	}
+	require.Nil(t, components.StoreComponents(storedComponent))
+
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", componentsGenerationEndpoint())
+
+	writer := httptest.NewRecorder()
+	request, _ := http.NewRequest("POST", "/", nil)
+
+	mux.ServeHTTP(writer, request)
+
+	/*
+	 * Checking the HTTP status.
+	 */
+	assert.Equal(t, 200, writer.Code, "Invalid HTTP status")
+
+	/*
+	* Checking the content type.
+	 */
+	contentType := writer.Header().Get("Content-Type")
+	assert.Equal(t, "application/json", contentType, "Invalid Content-Type header")
+
+	var result components.Components
+	err := json.Unmarshal(writer.Body.Bytes(), &result)
+	require.Nil(t, err)
+	require.Equal(t, storedComponent.PluginName, result.PluginName)
+	require.Equal(t, storedComponent.AppComponent, result.AppComponent)
+	require.Equal(t, storedComponent.MainComponent, result.MainComponent)
+}
+
+func TestHandlePluginsEndpoint_NoComponents(t *testing.T) {
+	testUtils.DeleteAllStoreEntries(t)
+
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", componentsGenerationEndpoint())
+
+	writer := httptest.NewRecorder()
+	request, _ := http.NewRequest("POST", "/", nil)
+
+	mux.ServeHTTP(writer, request)
+
+	/*
+	 * Checking the HTTP status.
+	 */
+	assert.Equal(t, 404, writer.Code, "Invalid HTTP status")
+}
+
+func routesGenerationEndpoint() func(http.ResponseWriter, *http.Request) {
 	return handlers.NewGenerationHandler(
-		func(w http.ResponseWriter, configurations []registration.PluginConfiguration) {
+		func(w http.ResponseWriter, configurations []registration.PluginConfiguration, AppComponents *components.Components) {
 			bytes, err := json.Marshal(configurations)
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+			} else {
+				w.WriteHeader(http.StatusOK)
+				w.Write(bytes)
+			}
+		}).HandlePluginsEndpoint
+}
+
+func componentsGenerationEndpoint() func(http.ResponseWriter, *http.Request) {
+	return handlers.NewGenerationHandler(
+		func(w http.ResponseWriter, configurations []registration.PluginConfiguration, appComponents *components.Components) {
+			if appComponents == nil {
+				w.WriteHeader(http.StatusNotFound)
+				return
+			}
+			bytes, err := json.Marshal(appComponents)
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
 			} else {
