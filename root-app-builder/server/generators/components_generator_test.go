@@ -21,10 +21,10 @@ func TestGenerateComponentsFile_NoComponents(t *testing.T) {
 	expected := "Object.defineProperty(exports, \"__esModule\", {\n"
 	expected += "  value: true\n"
 	expected += "});\n"
-	expected += "var component = require('../components/App.react').default;\n"
-	expected += "var component = require('../components/Main.react').default;\n"
-	expected += "exports.App = component;\n"
-	expected += "exports.Main = component;\n"
+	expected += "var App = require('../components/App.react').default;\n"
+	expected += "var Main = require('../components/Main.react').default;\n"
+	expected += "exports.App = App;\n"
+	expected += "exports.Main = Main;\n"
 	require.Equal(t, expected, string(bytes))
 }
 
