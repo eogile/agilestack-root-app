@@ -1,11 +1,22 @@
 //noinspection JSUnresolvedVariable
-import React from 'react';
+import React, {Component} from 'react';
 
-export default ({children}) => (
-  <div className="main-container">
-    <h1>Default main container</h1>
-    <div>
-      {children}
-    </div>
-  </div>
-);
+var Home = require('./Home.react');
+
+class Main extends Component {
+  render() {
+    return (
+      <div className="main-container">
+        <h1>Default main container tavu</h1>
+        <div>
+          <Home/>
+        </div>
+        <div>
+          {this.props.children}
+        </div>
+      </div>
+    );
+  }
+}
+
+export default Main;

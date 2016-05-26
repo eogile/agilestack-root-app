@@ -20,12 +20,14 @@ const renderRoute = (route) => {
   /*
    * If it has no children it must have a path.
    */
+  console.log('renderRouteWithNoChildren');
   return (
     <Route key={route.href} path={route.href} component={route.component} />
   )
 };
 
 const renderRouteWithChildren = (route) => {
+  console.log('renderRouteWithChildren');
   const props = {
     key: route.href || (counter++),
     component: route.component
@@ -48,6 +50,7 @@ const renderRouteWithChildren = (route) => {
  * Returns the JSX statement for the given index route.
  */
 const renderIndexRoute = (route) => {
+  console.log('renderIndexRoute');
   return <IndexRoute key={counter++} component={route.component} />
 };
 

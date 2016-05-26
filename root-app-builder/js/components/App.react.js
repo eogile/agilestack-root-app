@@ -1,6 +1,8 @@
 //noinspection JSUnresolvedVariable
 import React from 'react';
 
-export default ({children}) => (
+const App = ({children}) => (
   <div className="app-container wrapper">{children}</div>
 );
+
+export default App;
