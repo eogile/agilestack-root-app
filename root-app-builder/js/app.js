@@ -84,5 +84,5 @@ ReactDOM.render(
 /*
  * Loading the main menu
  */
-// import {asyncLoadMainMenu} from './actions/AppActions';
-// store.dispatch(asyncLoadMainMenu());
+import {asyncLoadMainMenu} from './actions/AppActions';
+store.dispatch(asyncLoadMainMenu());
