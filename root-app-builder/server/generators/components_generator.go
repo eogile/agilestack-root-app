@@ -24,9 +24,9 @@ func generateComponents(components *components.Components) string {
 }
 
 func defaultComponents() string {
-	result := "var component = require('../components/App.react').default;\n"
-	result += "var component = require('../components/Main.react').default;\n"
-	result+= "exports.App = component;\n"
-	result+= "exports.Main = component;\n"
+	result := "var App = require('../components/App.react').default;\n"
+	result += "var Main = require('../components/Main.react').default;\n"
+	result+= "exports.App = App;\n"
+	result+= "exports.Main = Main;\n"
 	return result
 }
