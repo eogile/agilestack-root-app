@@ -2,7 +2,7 @@ NAME = root-app-builder
 IMAGE_NAME = agilestack-$(NAME)
 
 SWAGGER_SPEC = swagger.json
-GO_FILES=*.go
+GO_FILES=*.go */*/*.go
 
 
 ############################
