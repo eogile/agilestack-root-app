@@ -27,7 +27,7 @@ func TestGenerateRoutesFileNoRoutes(t *testing.T) {
 	expected := "Object.defineProperty(exports, \"__esModule\", {\n"
 	expected += "  value: true\n"
 	expected += "});\n"
-	expected += "exports.default = [];\n"
+	expected += "exports.default = [{isIndex: true, type: 'content-route', component: require('../components/Home.react').default, routes: []}];\n"
 
 	require.Equal(t, expected, string(bytes),
 		"The file content does not match")

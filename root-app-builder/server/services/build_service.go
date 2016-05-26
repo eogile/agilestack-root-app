@@ -31,3 +31,17 @@ func BuildApplication() error {
 	}
 
 }
+
+func LoadAndBuildApplication() error {
+	configurations, appComponents, err := LoadApplication()
+	if err != nil {
+		return err
+	}
+
+	err = GenerateApplication(configurations, appComponents)
+	if err != nil {
+		return err
+	}
+
+	return BuildApplication()
+}

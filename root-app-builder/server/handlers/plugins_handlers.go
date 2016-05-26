@@ -4,11 +4,10 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/eogile/agilestack-utils/plugins/registration"
+	"github.com/eogile/agilestack-root-app/root-app-builder/server/services"
 	"github.com/eogile/agilestack-utils/plugins/components"
+	"github.com/eogile/agilestack-utils/plugins/registration"
 )
-
-
 
 type registrationHandler struct {
 	delegateFunction func(http.ResponseWriter, []registration.PluginConfiguration, *components.Components)
@@ -31,18 +30,13 @@ func (h *registrationHandler) HandlePluginsEndpoint(w http.ResponseWriter, r *ht
 	}
 }
 
-func (h *registrationHandler)  handlePluginsPost(w http.ResponseWriter, r *http.Request) {
+func (h *registrationHandler) handlePluginsPost(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
 
-	configurations, err := registration.ListRoutesAndReducers()
+	configurations, appComponents, err := services.LoadApplication()
 	if err != nil {
-		log.Println("Error while loading configurations from Consul", err)
-	}
-
-	appComponents, err := components.GetComponents()
-	if err != nil {
-		log.Println("Error while loading app components from Consul", err)
+		return
 	}
 
 	/*

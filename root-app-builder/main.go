@@ -47,16 +47,17 @@ func main() {
 	 */
 	files.CheckFilesExistence()
 
-	err := services.BuildApplication()
+	err := services.LoadAndBuildApplication()
 	if err != nil {
 		log.Fatalln("Unable to build the application: ", err)
 	}
 
 	http.HandleFunc("/status", plugins.HandleHttpStatusUrl)
-	http.HandleFunc("/plugins", handlers.NewGenerationHandler(handlers.BuildApplication).HandlePluginsEndpoint)
+	http.HandleFunc("/plugins", handlers.NewGenerationHandler(handlers.BuildApplicationHandler).HandlePluginsEndpoint)
 	http.HandleFunc("/menu-entries", handlers.HandleMenuEntriesEndpoint)
 	http.ListenAndServe(":8080", nil)
 }
+
 /*
  * modify the index.html to use the url prefix (basename) provided by environment variable
  */

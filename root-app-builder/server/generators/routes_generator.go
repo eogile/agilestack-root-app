@@ -19,7 +19,7 @@ func generateRoutes(configs []registration.PluginConfiguration) string {
 	result += "});\n"
 
 	if len(configs) == 0 {
-		return result + "exports.default = [];\n"
+		return result + "exports.default = [{isIndex: true, type: 'content-route', component: require('../components/Home.react').default, routes: []}];\n"
 	}
 
 	/*
